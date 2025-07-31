@@ -34,8 +34,7 @@ async function getPlayerBalance(characterId) {
 async function depositMoney(characterId, amount) {
   try {
     if (amount < 5000) {
-      alert("Minimální částka pro vklad je 5 000 Kč.");
-      return false;
+      throw new Error("Minimální částka pro vklad je 5 000 Kč.");
     }
     const playerRef = ref(db, `players/${characterId}`);
     const currentBalance = await getPlayerBalance(characterId);
@@ -52,16 +51,14 @@ async function depositMoney(characterId, amount) {
 async function withdrawMoney(characterId, amount) {
   try {
     if (amount < 20000) {
-      alert("Minimální částka pro výběr je 20 000 Kč.");
-      return false;
+      throw new Error("Minimální částka pro výběr je 20 000 Kč.");
     }
     const playerRef = ref(db, `players/${characterId}`);
     const currentBalance = await getPlayerBalance(characterId);
     if (currentBalance === null) return false;
 
     if (currentBalance < amount) {
-      alert("Nedostatečný zůstatek pro výběr.");
-      return false;
+      throw new Error("Nedostatečný zůstatek pro výběr.");
     }
 
     await update(playerRef, { balance: currentBalance - amount });

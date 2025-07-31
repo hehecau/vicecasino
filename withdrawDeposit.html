@@ -40,9 +40,9 @@
         <div class="bg-primary text-white rounded p-3 shadow mt-3" style="max-width: 300px; width: 100%;">
           <h3>wallet.</h3>
           <p>Provozovatel platební brány</p>
-          <p>Váš aktuální zůstatek: <strong id="balance">0$</strong></p>
-          <input type="text" class="form-control mb-2" id="characterId" placeholder="Zadejte Character ID">
+          <p>Váš aktuální zůstatek: <strong id="balance">0 Kč</strong></p>
         </div>
+        <div id="alertContainer" class="mt-3 w-100" style="max-width: 500px;"></div>
       </div>
     </section>
 
@@ -90,86 +90,94 @@
   <script type="module">
     import { getPlayerBalance, depositMoney, withdrawMoney } from './scripts/playerData.js';
 
-    const characterIdInput = document.getElementById('characterId');
     const balanceDisplay = document.getElementById('balance');
     const depositButton = document.getElementById('depositButton');
     const withdrawButton = document.getElementById('withdrawButton');
     const inputDeposit = document.getElementById('inputDeposit');
     const inputWithdraw = document.getElementById('inputWithdraw');
+    const alertContainer = document.getElementById('alertContainer');
 
-    // Use 'change' or 'blur' instead of 'input' to avoid partial writes
-    characterIdInput.addEventListener('blur', async () => {
-      const characterId = characterIdInput.value.trim();
-      // Validate characterId length (adjust based on your requirements)
-      if (characterId && characterId.length >= 6) {
-        try {
-          const balance = await getPlayerBalance(characterId);
-          balanceDisplay.textContent = `${balance}$`;
+    function showAlert(message, type = 'success') {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type} alert-dismissible fade show`;
+      alert.role = 'alert';
+      alert.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alert);
+      setTimeout(() => alert.classList.remove('show'), 5000);
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const characterId = urlParams.get('characterId')?.trim();
+    if (characterId) {
+      getPlayerBalance(characterId)
+        .then(balance => {
+          balanceDisplay.textContent = `${balance} Kč`;
           depositButton.disabled = false;
           withdrawButton.disabled = false;
-        } catch (error) {
+        })
+        .catch(error => {
           console.error('Balance fetch error:', error);
           balanceDisplay.textContent = 'Chyba při načítání zůstatku';
+          showAlert('Chyba při načítání zůstatku', 'danger');
           depositButton.disabled = true;
           withdrawButton.disabled = true;
-        }
-      } else {
-        balanceDisplay.textContent = '0$';
-        depositButton.disabled = true;
-        withdrawButton.disabled = true;
-        if (characterId && characterId.length < 6) {
-          alert('Character ID musí mít alespoň 6 znaků.');
-        }
-      }
-    });
+        });
+    } else {
+      showAlert('Chyba 2 pri načítaní zůstatku', 'danger');
+      balanceDisplay.textContent = '0 Kč';
+      depositButton.disabled = true;
+      withdrawButton.disabled = true;
+    }
 
     depositButton.addEventListener('click', async () => {
-      const characterId = characterIdInput.value.trim();
       const amount = parseInt(inputDeposit.value);
-      if (!characterId || characterId.length < 6) {
-        alert('Prosím zadejte platné Character ID (alespoň 6 znaků).');
+      if (!characterId) {
+        showAlert('Chyba 3 pri načítaní zůstatku', 'danger');
         return;
       }
       if (isNaN(amount) || amount <= 0) {
-        alert('Prosím zadejte platnou částku.');
+        showAlert('Zadejte platnou částku', 'danger');
         return;
       }
       try {
         const success = await depositMoney(characterId, amount);
         if (success) {
-          alert('Vklad proběhl úspěšně!');
+          showAlert('Vklad proběhl úspěšně!', 'success');
           const balance = await getPlayerBalance(characterId);
-          balanceDisplay.textContent = `${balance}$`;
+          balanceDisplay.textContent = `${balance} Kč`;
           inputDeposit.value = '';
         }
       } catch (error) {
         console.error('Deposit error:', error);
-        alert(`Chyba při vkladu peněz: ${error.message}`);
+        showAlert(`Chyba při vkladu peněz: ${error.message}`, 'danger');
       }
     });
 
     withdrawButton.addEventListener('click', async () => {
-      const characterId = characterIdInput.value.trim();
       const amount = parseInt(inputWithdraw.value);
-      if (!characterId || characterId.length < 6) {
-        alert('Prosím zadejte platné Character ID (alespoň 6 znaků).');
+      if (!characterId) {
+        showAlert('CChyba 4 pri načítaní zůstatku', 'danger');
         return;
       }
       if (isNaN(amount) || amount <= 0) {
-        alert('Prosím zadejte platnou částku.');
+        showAlert('Zadejte platnou částku', 'danger');
         return;
       }
       try {
         const success = await withdrawMoney(characterId, amount);
         if (success) {
-          alert('Výběr proběhl úspěšně!');
+          showAlert('Výběr proběhl úspěšně!', 'success');
           const balance = await getPlayerBalance(characterId);
-          balanceDisplay.textContent = `${balance}$`;
+          balanceDisplay.textContent = `${balance} Kč`;
           inputWithdraw.value = '';
         }
       } catch (error) {
         console.error('Withdrawal error:', error);
-        alert(`Chyba při výběru peněz: ${error.message}`);
+        showAlert(`Chyba při výběru peněz: ${error.message}`, 'danger');
       }
     });
   </script>
