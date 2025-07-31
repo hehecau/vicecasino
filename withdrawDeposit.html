@@ -57,7 +57,7 @@
                 Minimální částka pro vklad je 5 000 Kč.<br/>
               </p>
               <div class="d-flex flex-column gap-2">
-                <input type="number" class="form-control" id="inputDeposit" placeholder="1000">
+                <input type="number" class="form-control" id="inputDeposit" placeholder="1000" min="0">
                 <button type="button" class="btn btn-primary" id="depositButton" disabled>Odeslat</button>
               </div>
             </div>
@@ -70,7 +70,7 @@
                 Minimální částka pro výběr je 20 000 Kč.<br/>
               </p>
               <div class="d-flex flex-column gap-2">
-                <input type="number" class="form-control" id="inputWithdraw" placeholder="1000">
+                <input type="number" class="form-control" id="inputWithdraw" placeholder="1000" min="0">
                 <button type="button" class="btn btn-primary" id="withdrawButton" disabled>Odeslat</button>
               </div>
             </div>
@@ -97,9 +97,11 @@
     const inputDeposit = document.getElementById('inputDeposit');
     const inputWithdraw = document.getElementById('inputWithdraw');
 
-    characterIdInput.addEventListener('input', async () => {
+    // Use 'change' or 'blur' instead of 'input' to avoid partial writes
+    characterIdInput.addEventListener('blur', async () => {
       const characterId = characterIdInput.value.trim();
-      if (characterId) {
+      // Validate characterId length (adjust based on your requirements)
+      if (characterId && characterId.length >= 6) {
         try {
           const balance = await getPlayerBalance(characterId);
           balanceDisplay.textContent = `${balance}$`;
@@ -115,14 +117,17 @@
         balanceDisplay.textContent = '0$';
         depositButton.disabled = true;
         withdrawButton.disabled = true;
+        if (characterId && characterId.length < 6) {
+          alert('Character ID musí mít alespoň 6 znaků.');
+        }
       }
     });
 
     depositButton.addEventListener('click', async () => {
       const characterId = characterIdInput.value.trim();
       const amount = parseInt(inputDeposit.value);
-      if (!characterId) {
-        alert('Prosím zadejte Character ID.');
+      if (!characterId || characterId.length < 6) {
+        alert('Prosím zadejte platné Character ID (alespoň 6 znaků).');
         return;
       }
       if (isNaN(amount) || amount <= 0) {
@@ -146,8 +151,8 @@
     withdrawButton.addEventListener('click', async () => {
       const characterId = characterIdInput.value.trim();
       const amount = parseInt(inputWithdraw.value);
-      if (!characterId) {
-        alert('Prosím zadejte Character ID.');
+      if (!characterId || characterId.length < 6) {
+        alert('Prosím zadejte platné Character ID (alespoň 6 znaků).');
         return;
       }
       if (isNaN(amount) || amount <= 0) {
