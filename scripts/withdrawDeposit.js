@@ -20,9 +20,14 @@ function showAlert(message, type = 'success') {
   setTimeout(() => alert.classList.remove('show'), 5000);
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-const characterId = urlParams.get('characterId')?.trim() || localStorage.getItem('characterId')?.trim();
-console.log('Character ID:', characterId);
+let characterId = localStorage.getItem('characterId')?.trim();
+if (!characterId) {
+  const urlParams = new URLSearchParams(window.location.search);
+  characterId = urlParams.get('characterId')?.trim();
+  if (characterId && /^\d+$/.test(characterId)) {
+    localStorage.setItem('characterId', characterId);
+  }
+}
 
 if (characterId && /^\d+$/.test(characterId)) {
   getPlayerBalance(characterId)
@@ -48,7 +53,7 @@ if (characterId && /^\d+$/.test(characterId)) {
 depositButton.addEventListener('click', async () => {
   const amount = parseInt(inputDeposit.value);
   if (!characterId || !/^\d+$/.test(characterId)) {
-    showAlert('Chyba 5 pri načítaní zůstatku', 'danger');
+    showAlert('Neplatné characterId', 'danger');
     return;
   }
   if (isNaN(amount) || amount <= 0) {
@@ -56,13 +61,11 @@ depositButton.addEventListener('click', async () => {
     return;
   }
   try {
-    const success = await depositMoney(characterId, amount);
-    if (success) {
-      showAlert('Vklad proběhl úspěšně!', 'success');
-      const balance = await getPlayerBalance(characterId);
-      balanceDisplay.textContent = `${balance} Kč`;
-      inputDeposit.value = '';
-    }
+    await depositMoney(characterId, amount);
+    showAlert('Vklad proběhl úspěšně!', 'success');
+    const balance = await getPlayerBalance(characterId);
+    balanceDisplay.textContent = `${balance} Kč`;
+    inputDeposit.value = '';
   } catch (error) {
     console.error('Deposit error:', error);
     showAlert(`Chyba při vkladu peněz: ${error.message}`, 'danger');
@@ -72,7 +75,7 @@ depositButton.addEventListener('click', async () => {
 withdrawButton.addEventListener('click', async () => {
   const amount = parseInt(inputWithdraw.value);
   if (!characterId || !/^\d+$/.test(characterId)) {
-    showAlert('Chyba 5 pri načítaní zůstatku', 'danger');
+    showAlert('Neplatné characterId', 'danger');
     return;
   }
   if (isNaN(amount) || amount <= 0) {
@@ -80,13 +83,11 @@ withdrawButton.addEventListener('click', async () => {
     return;
   }
   try {
-    const success = await withdrawMoney(characterId, amount);
-    if (success) {
-      showAlert('Výběr proběhl úspěšně!', 'success');
-      const balance = await getPlayerBalance(characterId);
-      balanceDisplay.textContent = `${balance} Kč`;
-      inputWithdraw.value = '';
-    }
+    await withdrawMoney(characterId, amount);
+    showAlert('Výběr proběhl úspěšně!', 'success');
+    const balance = await getPlayerBalance(characterId);
+    balanceDisplay.textContent = `${balance} Kč`;
+    inputWithdraw.value = '';
   } catch (error) {
     console.error('Withdrawal error:', error);
     showAlert(`Chyba při výběru peněz: ${error.message}`, 'danger');
