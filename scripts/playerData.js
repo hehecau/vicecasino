@@ -89,10 +89,15 @@ function updateNavbarBalance(characterId) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const characterId = urlParams.get('characterId')?.trim();
+  let characterId = urlParams.get('characterId')?.trim();
+
+  if (characterId && /^\d+$/.test(characterId)) {
+    localStorage.setItem('characterId', characterId);
+  } else {
+    characterId = localStorage.getItem('characterId')?.trim();
+  }
+
   updateNavbarBalance(characterId);
 });
 
-export { updateNavbarBalance };
-
-export { getPlayerBalance, depositMoney, withdrawMoney };
+export { updateNavbarBalance, getPlayerBalance, depositMoney, withdrawMoney };
