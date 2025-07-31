@@ -1,0 +1,63 @@
+body {
+    background-color: #121212;
+    color: #fff;
+}
+.hero {
+    min-height: 40vh; /* Changed from height to min-height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding-top: 70px;
+    padding-bottom: 2rem;
+}
+.background {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    overflow: hidden;
+}
+.background img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(14px);
+    transition: opacity 2s ease-in-out;
+    will-change: opacity;
+}
+.background img:first-child {
+    animation: fade 20s infinite;
+}
+.background img:last-child {
+    animation: fade 20s infinite 10s; 
+}
+@keyframes fade {
+    0%, 20% { opacity: 1; z-index: 1; } 
+    25%, 45% { opacity: 0; z-index: 0; }
+    50%, 70% { opacity: 0; z-index: 0; } 
+    75%, 95% { opacity: 1; z-index: 1; } 
+    100% { opacity: 1; z-index: 1; } 
+}
+.card {
+    background-color: #1f1f1f;
+}
+.card img {
+    height: 180px;
+    object-fit: cover;
+}
+.contacts_main {
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 1rem;
+    background: #111; 
+}
+footer {
+    flex-shrink: 0;
+    background-color: #222;
+    color: white;
+}
