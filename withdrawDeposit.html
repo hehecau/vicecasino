@@ -116,7 +116,7 @@
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    const characterId = urlParams.get('characterId')?.trim();
+    const characterId = urlParams.get('characterId')?.trim() || localStorage.getItem('characterId')?.trim();
 
     if (characterId && /^\d+$/.test(characterId)) {
       getPlayerBalance(characterId)
