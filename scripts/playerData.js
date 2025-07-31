@@ -27,7 +27,7 @@ async function getPlayerBalance(characterId) {
     }
   } catch (error) {
     console.error("Error getting balance:", error.message, error.code);
-    throw new Error(`Failed to get balance: ${error.message}`);
+    throw new Error(`Nemožno získať zostatok: ${error.message}`);
   }
 }
 
@@ -44,7 +44,7 @@ async function depositMoney(characterId, amount) {
     return true;
   } catch (error) {
     console.error("Error depositing money:", error.message, error.code);
-    throw new Error(`Failed to deposit money: ${error.message}`);
+    throw new Error(`Nemožno vložit peníze: ${error.message}`);
   }
 }
 
@@ -65,7 +65,7 @@ async function withdrawMoney(characterId, amount) {
     return true;
   } catch (error) {
     console.error("Error withdrawing money:", error.message, error.code);
-    throw new Error(`Failed to withdraw money: ${error.message}`);
+    throw new Error(`Nemožno vybrat peníze: ${error.message}`);
   }
 }
 

@@ -112,7 +112,8 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const characterId = urlParams.get('characterId')?.trim();
-    if (characterId) {
+
+    if (characterId && /^\d+$/.test(characterId)) {
       getPlayerBalance(characterId)
         .then(balance => {
           balanceDisplay.textContent = `${balance} Kč`;
@@ -127,7 +128,7 @@
           withdrawButton.disabled = true;
         });
     } else {
-      showAlert('Chyba 2 pri načítaní zůstatku', 'danger');
+      showAlert('Chyba 5 pri načítaní zůstatku', 'danger');
       balanceDisplay.textContent = '0 Kč';
       depositButton.disabled = true;
       withdrawButton.disabled = true;
@@ -135,8 +136,8 @@
 
     depositButton.addEventListener('click', async () => {
       const amount = parseInt(inputDeposit.value);
-      if (!characterId) {
-        showAlert('Chyba 3 pri načítaní zůstatku', 'danger');
+      if (!characterId || !/^\d+$/.test(characterId)) {
+        showAlert('Chyba 5 pri načítaní zůstatku', 'danger');
         return;
       }
       if (isNaN(amount) || amount <= 0) {
@@ -159,8 +160,8 @@
 
     withdrawButton.addEventListener('click', async () => {
       const amount = parseInt(inputWithdraw.value);
-      if (!characterId) {
-        showAlert('CChyba 4 pri načítaní zůstatku', 'danger');
+      if (!characterId || !/^\d+$/.test(characterId)) {
+        showAlert('Chyba 5 pri načítaní zůstatku', 'danger');
         return;
       }
       if (isNaN(amount) || amount <= 0) {
