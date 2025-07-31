@@ -69,4 +69,30 @@ async function withdrawMoney(characterId, amount) {
   }
 }
 
+function updateNavbarBalance(characterId) {
+  const balanceDisplay = document.getElementById('navbarBalance');
+  if (!balanceDisplay) return;
+
+  if (characterId && /^\d+$/.test(characterId)) {
+    getPlayerBalance(characterId)
+      .then(balance => {
+        balanceDisplay.textContent = `${balance} Kč`;
+      })
+      .catch(error => {
+        console.error('Navbar balance fetch error:', error);
+        balanceDisplay.textContent = 'Chyba';
+      });
+  } else {
+    balanceDisplay.textContent = '0 Kč';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const characterId = urlParams.get('characterId')?.trim();
+  updateNavbarBalance(characterId);
+});
+
+export { updateNavbarBalance };
+
 export { getPlayerBalance, depositMoney, withdrawMoney };
